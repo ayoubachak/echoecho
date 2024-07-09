@@ -163,13 +163,24 @@ class HuggingFaceModel(BaseModel):
         return f"{prompt}"
 
     def sys_inference(self, sys_prompt: str, usr_prompt: str, seed: int = None) -> str:
+        logger.info(f"MAX_ITTERATIONS : {self.max_itterations}")
         # be careful if you add a breakline manually without the \n, as the indentation of the string will count too which is uneeded.
         prompt = f'''{self.get_input_prefix()}\nsystem : {self.wrapp_prompt(sys_prompt.strip(), role="system")}\nuser : {self.wrapp_prompt(usr_prompt.strip(), role="user")}\n{self.get_input_suffix()}'''
         if self.get_pre_prompt():
             prompt = f"{self.get_pre_prompt_prefix()}{self.get_pre_prompt()}{self.get_pre_prompt_suffix()}\n{prompt}"
         logger.info(f"System inference with system prompt: {sys_prompt[:20]}, user prompt: {usr_prompt[:20]}")
         return self.inference(prompt=prompt, seed=seed)
-
+    
+    def inference_with_tokens(self, prompt: str, max_new_tokens: int = 2) -> str:
+        logger.info(f"Running inference with prompt: {prompt[:20]}... and max_new_tokens: {max_new_tokens}")
+        params = self.config.get('default_parameters', {}).copy()
+        params["max_new_tokens"] = max_new_tokens
+        generated_text = self.generate_text(prompt, params)
+        if generated_text.get("error"):
+            logger.error(f"Inference error: {generated_text.get('message')}")
+            return generated_text.get("message")
+        return generated_text.get("generated_text", "")
+    
     def rotate_token(self):
         starting_index = self.current_token_index
         while True:
