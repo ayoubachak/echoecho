@@ -59,7 +59,7 @@ class ModelPreset:
     
     
 
-class HFModels:
+class HFModel:
     def __init__(
         self,
         id: int = None,

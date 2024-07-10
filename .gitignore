@@ -1,6 +1,4 @@
 __pycache__/
 venv/
-hf_models.json
 tokens.json
-presets.json
 *.txt

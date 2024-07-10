@@ -9,7 +9,7 @@ class AIModels:
         self.models : dict[str, BaseModel]= {"LM Studio": LMStudioModel.load_config("models/configs/lm_studio.config.json")}
         for hf_model in globals_.hf_models:
             model : HuggingFaceModel = HuggingFaceModel.setup_from_dict(hf_model.kwargs)
-            model.preset = globals_.get_preset_from_id(model.preset)
+            model.preset = globals_.get_preset_by_id(model.preset)
             self.models[hf_model.name] = model
 
     

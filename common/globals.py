@@ -1,4 +1,4 @@
-from common.models import HFToken, ModelPreset, HFModels
+from common.models import HFToken, ModelPreset, HFModel
 from .logger import logger
 import json
 
@@ -7,7 +7,7 @@ class Globals:
     def __init__(self):
         self.tokens : list[HFToken] = self.load_tokens()
         self.presets : list[ModelPreset] = self.load_presets()
-        self.hf_models : list[HFModels] = self.load_hf_models()
+        self.hf_models : list[HFModel] = self.load_hf_models()
         
     def load_tokens(self) -> list[HFToken] :
         try:
@@ -35,25 +35,30 @@ class Globals:
             logger.error(f"Failed to load presets: {e}")
             return []
     
-    def load_hf_models(self) -> list[HFModels]:
+    def load_hf_models(self) -> list[HFModel]:
         try:
             with open('hf_models.json', 'r') as file:
                 hf_models = json.load(file)
                 assert len(hf_models) > 0, "No HuggingFace models found, please make sure to add models to the hf_models.json file."
                 logger.info("Loaded {} HuggingFace models".format(len(hf_models)))
-                all_hf_models = [HFModels(**model) for model in hf_models]
+                all_hf_models = [HFModel(**model) for model in hf_models]
                 self.hf_models = all_hf_models
                 return all_hf_models
         except Exception as e:
             logger.error(f"Failed to load HuggingFace models: {e}")
             return []
     
-    def get_preset_from_id(self, preset_id) -> ModelPreset:
+    def get_preset_by_id(self, preset_id) -> ModelPreset:
         for preset in globals_.presets:
             if preset.id == preset_id:
                 return preset
         return None
     
+    def get_model_by_id(self, model_id) -> HFModel:
+        for model in globals_.hf_models:
+            if model.id == model_id:
+                return model
+        return None
     
 
 globals_ = Globals()
